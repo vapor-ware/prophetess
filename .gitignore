@@ -1,0 +1,5 @@
+*.pyc
+__pycache__
+config/pipeline.yaml
+*.egg-info
+.venv

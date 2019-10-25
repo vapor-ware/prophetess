@@ -1,0 +1,36 @@
+
+extractors:
+  sf-accounts:
+    plugin: Salesforce
+    config:
+      # Each plugin has their own required and optional config
+      client_id: foo
+      user: baz
+      key: private_key
+      instance: bar
+      query: |
+        SELECT Id, Name
+        FROM Account
+
+loaders:
+  nb-tenant:
+    plugin: Netbox
+    config:
+      host: https://netbox.bro
+      api_key: abcd123
+      endpoint: dcim
+      model: tenants
+      pk:
+        - slug
+
+pipelines:
+  account-sync:
+    # Pipelines can combine any number of extractors and loaders
+    extractors:
+    - sf-accounts
+    loaders:
+    - nb-tenant
+    # Transform can be either standard YAMLTransform, or a sepcific Transformer class
+    transform:
+      name: "{Name}"
+      slug: "{Id}"

@@ -1,0 +1,68 @@
+
+import asyncio
+import importlib
+
+from prophetess.exceptions import InvalidConfigurationException
+
+
+def build_plugin(plugin_type, plugin_id, plugin_config):
+    plugin_name = plugin_config.get('plugin')
+    module = 'prophetess.plugins.{}'.format(plugin_name.lower())
+    name = '{}{}'.format(plugin_name, plugin_type)
+    plugin = getattr(importlib.import_module(module), name)
+
+    return plugin(id=plugin_id, config=plugin_config.get('config'))
+
+
+class PluginBase(object):
+    config = {}
+    required_config = ()
+
+    def __init__(self, *, id, config, loop=None):
+
+        self.id = id
+        self.config = self.sanitize_config(config)
+        self._loop = loop
+
+    def sanitize_config(self, config):
+        if not all(required in config for required in self.required_config):
+            raise InvalidConfigurationException('Missing required keys: {}'.format(', '.join(self.required_config)))
+
+        return config
+
+    @property
+    def loop(self):
+        return self._loop or asyncio.get_event_loop()
+
+    async def close(self):
+        pass
+
+    def __str__(self):
+        return '{}({})'.format(type(self).__name__, self.id)
+
+
+class Extractor(PluginBase):
+
+    async def run(self):
+        pass
+
+
+class Loader(PluginBase):
+
+    async def run(self, record):
+        pass
+
+
+class Transformer(PluginBase):
+
+    def format(self, str, map):
+        return str.format(**map)
+
+    async def parse(self, keys, values):
+        if isinstance(keys, str):
+            return self.format(keys, values)
+
+        return {k: await self.parse(v, values) for k, v in keys.items()}
+
+    async def run(self, data):
+        return await self.parse(self.config, data)

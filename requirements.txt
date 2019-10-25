@@ -1,2 +1,2 @@
-aiohttp[speedups]==3.6.2
+aiohttp[speedups]==3.6.0
 PyYAML==5.1.2

@@ -92,6 +92,15 @@ class NetboxLoader(Loader):
             method = self.update_method
             payload['id'] = er.id
 
+        if method == 'partial_update':
+            lookups = self.config.get('lookups', {}).keys()
+            changed_record = {k: record[k] for k, v in record.items() if getattr(er, k) != v}
+            if not changed_record:
+                log.debug('Skipping {} as no data has changed'.format(record))
+                return
+
+            payload['data'] = changed_record
+
         func = self.client.build_model(api, self.config.get('endpoint'), self.config.get('model'), method)
 
         try:

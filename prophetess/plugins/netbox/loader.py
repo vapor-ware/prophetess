@@ -111,3 +111,6 @@ class NetboxLoader(Loader):
         except TypeError:
             # Bad parameters
             raise
+
+    async def close(self):
+        await self.client.close()

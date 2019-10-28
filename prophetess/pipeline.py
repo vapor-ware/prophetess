@@ -26,6 +26,10 @@ class Pipelines(collections.OrderedDict):
     def __init__(self):
         pass
 
+    async def close(self):
+        for p in self.values():
+            await p.close()
+
     def append(self, pipeline):
         self[pipeline.id] = pipeline
 
@@ -44,6 +48,10 @@ class Pipeline(object):
         self.extractors = extractors
         self.transform = transform
         self.loaders = loaders
+
+    async def close(self):
+        for e in self.extractors + [self.transform] + self.loaders:
+            await e.close()
 
     async def run(self):
         for e in self.extractors:

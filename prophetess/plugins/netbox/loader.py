@@ -41,9 +41,31 @@ class NetboxLoader(Loader):
 
         return config
 
+    async def lookup(self, record):
+        extracts = self.config.get('lookup')
+        if not extracts or not isinstance(extracts, collections.Mapping):
+            return record
 
+        for key, rules in extracts.items():
+            if key not in record:
+                log.debug('Skipping lookup "{}". Not found in record'.format(key))
+                continue
 
+            r = await self.client.entity(
+                api=self.client.get_api(rules.get('endpoint')),
+                endpoint=rules.get('endpoint'),
+                model=rules.get('model'),
+                params={k: record.get(key) for k in rules.get('pk', [])}
+            )
 
+            if not r:
+                log.debug('Lookup for {} ({}) failed, no record found'.fortmat(key, record.get(key)))
+                record[key] = None
+                continue
+
+            record[key] = r.id
+
+        return record
 
     async def run(self, record):
         """ Overload Loader.run to execute netbox loading of a record """
@@ -58,6 +80,8 @@ class NetboxLoader(Loader):
             )
         except:
             raise
+
+        record = await self.lookup(record)
 
         payload = {
             'data': record

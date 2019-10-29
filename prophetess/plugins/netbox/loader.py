@@ -55,7 +55,7 @@ class NetboxLoader(Loader):
                 api=self.client.get_api(rules.get('endpoint')),
                 endpoint=rules.get('endpoint'),
                 model=rules.get('model'),
-                params={k: record.get(key) for k in rules.get('pk', [])}
+                params=self.build(rules.get('pk', []), record)
             )
 
             if not r:
@@ -67,6 +67,17 @@ class NetboxLoader(Loader):
 
         return record
 
+    def build_params(self, config, record):
+        output = {}
+        for item in config:
+            if isinstance(item, str):
+                output[item] = record.get(item)
+            elif isinstance(item, collections.Mapping):
+                for k, tpl in item.items():
+                    output[k] = tpl.format(**record)
+
+        return output
+
     async def run(self, record):
         """ Overload Loader.run to execute netbox loading of a record """
         api = self.client.get_api(self.config.get('endpoint'))
@@ -76,7 +87,7 @@ class NetboxLoader(Loader):
                 api=api,
                 endpoint=self.config.get('endpoint'),
                 model=self.config.get('model'),
-                params={k: record.get(k) for k in self.config.get('pk')}
+                params=self.build_params(self.config.get('pk'), record)
             )
         except:
             raise

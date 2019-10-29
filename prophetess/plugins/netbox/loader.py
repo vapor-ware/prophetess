@@ -41,14 +41,14 @@ class NetboxLoader(Loader):
 
         return config
 
-    async def lookup(self, record):
-        extracts = self.config.get('lookup')
+    async def parse_fk(self, record):
+        extracts = self.config.get('fk')
         if not extracts or not isinstance(extracts, collections.Mapping):
             return record
 
         for key, rules in extracts.items():
             if key not in record:
-                log.debug('Skipping lookup "{}". Not found in record'.format(key))
+                log.debug('Skipping FK lookup "{}". Not found in record'.format(key))
                 continue
 
             r = await self.client.entity(
@@ -59,7 +59,7 @@ class NetboxLoader(Loader):
             )
 
             if not r:
-                log.debug('Lookup for {} ({}) failed, no record found'.fortmat(key, record.get(key)))
+                log.debug('FK lookup for {} ({}) failed, no record found'.fortmat(key, record.get(key)))
                 record[key] = None
                 continue
 
@@ -81,7 +81,7 @@ class NetboxLoader(Loader):
         except:
             raise
 
-        record = await self.lookup(record)
+        record = await self.parse_fk(record)
 
         payload = {
             'data': record

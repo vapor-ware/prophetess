@@ -2,7 +2,8 @@
 import logging
 import collections
 
-from prophetess.plugin import build_plugin, Transformer
+from prophetess.plugin import Transformer
+from prophetess.utils import build_plugin
 
 log = logging.getLogger(__name__)
 

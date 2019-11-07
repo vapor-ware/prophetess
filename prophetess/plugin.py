@@ -5,15 +5,6 @@ import importlib
 from prophetess.exceptions import InvalidConfigurationException
 
 
-def build_plugin(plugin_type, plugin_id, plugin_config):
-    plugin_name = plugin_config.get('plugin')
-    module = 'prophetess.plugins.{}'.format(plugin_name.lower())
-    name = '{}{}'.format(plugin_name, plugin_type)
-    plugin = getattr(importlib.import_module(module), name)
-
-    return plugin(id=plugin_id, config=plugin_config.get('config'))
-
-
 class PluginBase(object):
     config = {}
     required_config = ()

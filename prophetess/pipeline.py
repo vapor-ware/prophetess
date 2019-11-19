@@ -12,11 +12,23 @@ def build_pipelines(cfg):
     pipelines = Pipelines()
     extractors = cfg.get('extractors')
     loaders = cfg.get('loaders')
+    transformers = cfg.get('transformers', {})
+
     for name, data in cfg.get('pipelines', {}).items():
+        transform = data.get('transform')
+
+        if isinstance(transform, str):
+            transformer = build_plugin('Transformer', transform, transformers.get(transform))
+        elif isinstance(transform, collections.Mapping):
+            transformer = Transformer(id='YAMLTransformer', config=transform)
+        else:
+            log.error('Invalid pipeline configuration for {}, bad transform'.format(name))
+            continue
+
         pipelines.append(Pipeline(
             id=name,
             extractors=[build_plugin('Extractor', e, extractors[e]) for e in data.get('extractors', [])],
-            transform=Transformer(id='YAMLTransformer', config=data.get('transform')),
+            transform=transformer,
             loaders=[build_plugin('Loader', e, loaders[e]) for e in data.get('loaders', [])]
         ))
 

@@ -4,3 +4,5 @@ config/pipeline.yaml
 *.egg-info
 .venv
 .tox
+dist
+build

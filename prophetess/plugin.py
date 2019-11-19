@@ -1,6 +1,5 @@
 
 import asyncio
-import importlib
 
 from prophetess.exceptions import InvalidConfigurationException
 

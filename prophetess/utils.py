@@ -2,6 +2,7 @@
 import logging
 
 from prophetess import config
+from prophetess.exceptions import InvalidPlugin
 
 log = logging.getLogger(__name__)
 

@@ -12,3 +12,8 @@ class ServiceError(ProphetessException):
 class InvalidConfigurationException(ProphetessException):
     """Configuration for Prophetess or a plugin is invalid"""
     pass
+
+
+class InvalidPlugin(ProphetessException):
+    """A requested plugin does not exist"""
+    pass

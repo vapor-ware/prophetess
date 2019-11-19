@@ -12,13 +12,6 @@ from setuptools import find_packages, setup
 here = Path(__file__).parent
 
 
-def parse_requirements(filename: str) -> List[str]:
-    reqs = (here / filename).read_text().strip().split('\n')
-    reqs = [r.strip() for r in reqs]
-    reqs = [r for r in sorted(reqs) if r and not r.startswith('#')]
-    return reqs
-
-
 # Load the package's __init__.py file as a dictionary.
 pkg = {}
 with open(here / 'prophetess' / '__init__.py', 'r', 'utf-8') as f:
@@ -29,10 +22,6 @@ readme = ''
 if os.path.exists(here / 'README.md'):
     with open(here / 'README.md', 'r', 'utf-8') as f:
         readme = f.read()
-
-req = []
-if os.path.exists(here / 'requirements.txt'):
-    req = parse_requirements('requirements.txt')
 
 
 setup(
@@ -48,6 +37,9 @@ setup(
     package_data={'': ['LICENSE']},
     package_dir={'prophetess': 'prophetess'},
     python_requires='>=3.6',
-    install_requires=req,
+    install_requires=[
+        'aiohttp[speedups]',
+        'PyYAML',
+    ],
     zip_safe=False,
 )

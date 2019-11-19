@@ -17,4 +17,4 @@ def build_plugin(plugin_type, plugin_id, plugin_config):
     name = '{}{}'.format(plugin_name, plugin_type)
     plugin = getattr(config.PLUGINS.get(module_name), name)
 
-    return plugin(id=plugin_id, config=plugin_config.get('config'))
+    return plugin(id=plugin_id, config=plugin_config.get('config'), labels=(plugin_name, plugin_type, name))

@@ -2,17 +2,22 @@
 import asyncio
 
 from prophetess.exceptions import InvalidConfigurationException
+from prophetess.metrics import Timer, plugin_latency
 
 
 class PluginBase(object):
     config = {}
     required_config = ()
 
-    def __init__(self, *, id, config, loop=None):
+    def __init__(self, *, id, config, labels=None, loop=None):
 
         self.id = id
         self.config = self.sanitize_config(config)
         self._loop = loop
+        self.timer = Timer(
+            observer=plugin_latency,
+            labels=(self.id,) + (labels or (type(self).__name__, type(self).__name__, type(self).__name__))
+        )
 
     def sanitize_config(self, config):
         if not all(required in config for required in self.required_config):

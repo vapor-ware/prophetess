@@ -40,6 +40,7 @@ setup(
     install_requires=[
         'aiohttp[speedups]',
         'PyYAML',
+        'prometheus-client',
     ],
     zip_safe=False,
 )

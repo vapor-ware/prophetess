@@ -5,9 +5,11 @@ import yaml
 import asyncio
 import logging
 
-from prophetess.app import Prophetess
-from prophetess.config import DEBUG, CONFIG_FILE
+from aiohttp import web
 
+from prophetess.app import Prophetess
+from prophetess.config import DEBUG, CONFIG_FILE, PORT
+from prophetess.web import MetricsView
 
 log = logging.getLogger('prophetess')
 
@@ -27,6 +29,17 @@ with open(CONFIG_FILE) as f:
 loop = asyncio.get_event_loop()
 log.info('Starting Prophetess')
 
+# Some real raw AIOHtpp
+app = web.Application(logger=logging.getLogger('prophetess.web'))
+
+app.add_routes([
+    web.view('/metrics', MetricsView),
+])
+
+handler = app.make_handler()
+srv = loop.run_until_complete(loop.create_server(handler, '0.0.0.0', '8080'))
+log.info(f'Metric server running on 127.0.0.1:{PORT}')
+
 mage = Prophetess(cfg)
 asyncio.ensure_future(mage.start())
 
@@ -37,5 +50,9 @@ except KeyboardInterrupt:
 finally:
     log.info('Cleaning pipelines')
     loop.run_until_complete(mage.close())
+    log.info('Shutting down')
+    srv.close()
+    loop.run_until_complete(srv.wait_closed())
+    loop.run_until_complete(app.shutdown())
 
 log.info('Prophetess stopped')

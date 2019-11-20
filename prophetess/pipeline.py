@@ -89,14 +89,19 @@ class Pipeline():
             self.transform.timer.stop()
 
     async def load(self, record):
+        if not record:
+            return
+
         for l in self.loaders:
             log.debug('Running Loader: {}'.format(l))
 
             l.timer.start()
             try:
                 await l.run(record)
-            except ProphetessException:
-                raise
+            except ProphetessException as e:
+                log.warn('{} Loader failed: {}'.format(l.id, e))
+            except Exception as e:
+                log.error('{} raised unexpected exception: {}'.format(l.id, e))
             finally:
                 l.timer.stop()
 

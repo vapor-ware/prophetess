@@ -73,21 +73,20 @@ class Pipeline():
             async for record in e.run():
                 e.timer.stop()
                 log.debug('{} produced {}'.format(e, record))
-                payload = await self.process(record)
-                await self.load(payload)
+                await self.process(record)
+
         self.timer.stop()
 
     async def process(self, record):
         self.transform.timer.start()
         try:
-            payload = await self.transform.run(record)
-            log.debug('{} produced {}'.format(self.transform, payload))
+            async for payload in self.transform.run(record):
+                log.debug('{} produced {}'.format(self.transform, payload))
+                await self.load(payload)
         except KeyError:
             raise
         finally:
             self.transform.timer.stop()
-
-        return payload
 
     async def load(self, record):
         for l in self.loaders:

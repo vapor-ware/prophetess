@@ -53,11 +53,11 @@ class Transformer(PluginBase):
     def format(self, str, map):
         return str.format(**map)
 
-    async def parse(self, keys, values):
+    def parse(self, keys, values):
         if isinstance(keys, str):
             return self.format(keys, values)
 
-        return {k: await self.parse(v, values) for k, v in keys.items()}
+        return {k: self.parse(v, values) for k, v in keys.items()}
 
     async def run(self, data):
-        return await self.parse(self.config, data)
+        yield self.parse(self.config, data)

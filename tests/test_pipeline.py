@@ -4,6 +4,7 @@ from unittest.mock import call, patch
 
 import asynctest
 import pytest
+
 from prophetess import exceptions, metrics, pipeline, plugin
 
 

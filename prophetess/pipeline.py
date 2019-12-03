@@ -1,6 +1,6 @@
 
-import logging
 import collections
+import logging
 
 from prophetess.exceptions import ProphetessException
 from prophetess.metrics import Timer, pipeline_latency

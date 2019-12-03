@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 import asynctest
 import pytest
+
 from prophetess import app, exceptions, pipeline
 
 

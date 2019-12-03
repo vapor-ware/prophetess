@@ -1,7 +1,7 @@
 """Prophetess entry point"""
 
-import logging
 import asyncio
+import logging
 
 from prophetess.exceptions import ProphetessException
 from prophetess.pipeline import build_pipelines

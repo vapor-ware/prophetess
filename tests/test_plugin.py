@@ -3,6 +3,7 @@
 import asyncio
 
 import pytest
+
 from prophetess import exceptions, metrics, plugin
 
 from .fixtures import FakePlugin

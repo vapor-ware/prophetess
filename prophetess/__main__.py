@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 
-import sys
-import yaml
 import asyncio
 import logging
+import sys
 
+import yaml
 from aiohttp import web
 
 from prophetess.app import Prophetess
-from prophetess.config import DEBUG, CONFIG_FILE, PORT
+from prophetess.config import CONFIG_FILE, DEBUG, PORT
 from prophetess.web import MetricsView
 
 log = logging.getLogger('prophetess')

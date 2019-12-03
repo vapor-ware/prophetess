@@ -39,13 +39,13 @@ class PluginBase(object):
 class Extractor(PluginBase):
 
     async def run(self):
-        pass
+        raise NotImplementedError
 
 
 class Loader(PluginBase):
 
     async def run(self, record):
-        pass
+        raise NotImplementedError
 
 
 class Transformer(PluginBase):

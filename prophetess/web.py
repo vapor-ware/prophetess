@@ -1,7 +1,6 @@
 import logging
 
 from aiohttp import web
-
 from prometheus_client import core
 from prometheus_client.exposition import CONTENT_TYPE_LATEST, generate_latest
 

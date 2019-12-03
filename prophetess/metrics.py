@@ -3,7 +3,6 @@ import time
 
 from prometheus_client import Histogram
 
-
 pipeline_latency = Histogram(
     name='prophetess_pipeline_exec_time',
     documentation='The time it takes for a prophetess pipeline to complete',

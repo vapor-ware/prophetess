@@ -1,6 +1,6 @@
 
 __title__ = 'prophetess'
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 __description__ = 'YAML driven ETL'
 __author__ = 'Marco Ceppi'
 __author_email__ = 'marco@vapor.io'

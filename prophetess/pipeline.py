@@ -1,16 +1,17 @@
 
 import collections
 import logging
+from typing import Any, Dict, List, Tuple, Union
 
 from prophetess.exceptions import ProphetessException
 from prophetess.metrics import Timer, pipeline_latency
-from prophetess.plugin import Transformer
+from prophetess.plugin import Extractor, Loader, Transformer
 from prophetess.utils import build_plugin
 
 log = logging.getLogger(__name__)
 
 
-def build_pipelines(cfg):
+def build_pipelines(cfg: Dict[str, Any]) -> 'Pipelines':
     pipelines = Pipelines()
     extractors = cfg.get('extractors')
     loaders = cfg.get('loaders')
@@ -41,31 +42,37 @@ class Pipelines(collections.OrderedDict):
     def __init__(self):
         pass
 
-    async def close(self):
+    async def close(self) -> None:
         for p in self.values():
             await p.close()
 
-    def append(self, pipeline):
+    def append(self, pipeline: 'Pipeline') -> None:
         self[pipeline.id] = pipeline
 
-    def __str__(self):
+    def __str__(self) -> str:
         return '{}([{}])'.format(type(self).__name__, ', '.join([str(p) for p in self.values()]))
 
 
 class Pipeline():
 
-    def __init__(self, *, id, extractors, transform, loaders):
+    def __init__(
+            self, *,
+            id: str,
+            extractors: Union[List[Extractor], Tuple[Extractor]],
+            transform: Transformer,
+            loaders: Union[List[Loader], Tuple[Loader]],
+    ) -> None:
         self.id = id
         self.extractors = extractors
         self.transform = transform
         self.loaders = loaders
         self.timer = Timer(observer=pipeline_latency, labels=(self.id,))
 
-    async def close(self):
+    async def close(self) -> None:
         for e in self.extractors + [self.transform] + self.loaders:
             await e.close()
 
-    async def run(self):
+    async def run(self) -> None:
         self.timer.start()
         for e in self.extractors:
             log.debug('Running Extractor {}'.format(e))
@@ -77,7 +84,7 @@ class Pipeline():
 
         self.timer.stop()
 
-    async def process(self, record):
+    async def process(self, record: Dict[str, Any]) -> None:
         self.transform.timer.start()
         try:
             async for payload in self.transform.run(record):
@@ -88,7 +95,7 @@ class Pipeline():
         finally:
             self.transform.timer.stop()
 
-    async def load(self, record):
+    async def load(self, record: Dict[str, Any]) -> None:
         if not record:
             return
 
@@ -105,5 +112,5 @@ class Pipeline():
             finally:
                 l.timer.stop()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return '{}({})'.format(type(self).__name__, self.id)

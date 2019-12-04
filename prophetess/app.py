@@ -10,7 +10,7 @@ from prophetess.pipeline import build_pipelines
 log = logging.getLogger(__name__)
 
 
-class Prophetess():
+class Prophetess:
 
     def __init__(self, config: Dict) -> None:
         self.config = config

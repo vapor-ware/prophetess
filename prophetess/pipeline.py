@@ -39,8 +39,6 @@ def build_pipelines(cfg: Dict[str, Any]) -> 'Pipelines':
 
 
 class Pipelines(collections.OrderedDict):
-    def __init__(self):
-        pass
 
     async def close(self) -> None:
         for p in self.values():
@@ -53,7 +51,7 @@ class Pipelines(collections.OrderedDict):
         return '{}([{}])'.format(type(self).__name__, ', '.join([str(p) for p in self.values()]))
 
 
-class Pipeline():
+class Pipeline:
 
     def __init__(
             self, *,
@@ -106,7 +104,7 @@ class Pipeline():
             try:
                 await l.run(record)
             except ProphetessException as e:
-                log.warn('{} Loader failed: {}'.format(l.id, e))
+                log.warning('{} Loader failed: {}'.format(l.id, e))
             except Exception as e:
                 log.error('{} raised unexpected exception: {}'.format(l.id, e))
             finally:

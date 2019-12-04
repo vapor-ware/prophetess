@@ -1,13 +1,14 @@
 
 import logging
+from typing import Any, Dict
 
-from prophetess import config
+from prophetess import config, plugin
 from prophetess.exceptions import InvalidPlugin
 
 log = logging.getLogger(__name__)
 
 
-def build_plugin(plugin_type, plugin_id, plugin_config):
+def build_plugin(plugin_type: str, plugin_id: str, plugin_config: Dict[str, Any]) -> plugin.PluginBase:
     plugin_name = plugin_config.get('plugin')
     module_name = plugin_name.lower()
 

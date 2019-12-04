@@ -1,5 +1,6 @@
 
 import time
+from typing import Collection
 
 from prometheus_client import Histogram
 
@@ -17,14 +18,14 @@ plugin_latency = Histogram(
 
 
 class Timer():
-    def __init__(self, *, observer, labels):
+    def __init__(self, *, observer: Histogram, labels: Collection[str]) -> None:
         self.histogram = observer
         self._start_time = None
         self.labels = labels
 
-    def start(self):
+    def start(self) -> None:
         self._start_time = time.time()
 
-    def stop(self):
+    def stop(self) -> None:
         latency = time.time() - self._start_time
         self.histogram.labels(*self.labels).observe(latency)

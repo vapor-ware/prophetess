@@ -57,7 +57,8 @@ class Loader(PluginBase):
 
 class Transformer(PluginBase):
 
-    def format(self, string: str, mapping: Dict[str, Any]) -> str:
+    @staticmethod
+    def format(string: str, mapping: Dict[str, Any]) -> str:
         return string.format(**mapping)
 
     def parse(self, keys: Union[str, Dict[str, Any]], values: Dict[str, Any]) -> Union[str, Dict[str, Any]]:

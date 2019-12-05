@@ -36,9 +36,12 @@ app.add_routes([
     web.view('/metrics', MetricsView),
 ])
 
-handler = app.make_handler()
-srv = loop.run_until_complete(loop.create_server(handler, '0.0.0.0', '8080'))
-log.info(f'Metric server running on 127.0.0.1:{PORT}')
+# ref: https://docs.aiohttp.org/en/stable/web_advanced.html#aiohttp-web-app-runners
+runner = web.AppRunner(app)
+loop.run_until_complete(runner.setup())
+
+site = web.TCPSite(runner, '0.0.0.0', PORT)
+loop.run_until_complete(site.start())
 
 mage = Prophetess(cfg)
 asyncio.ensure_future(mage.start())
@@ -51,8 +54,7 @@ finally:
     log.info('Cleaning pipelines')
     loop.run_until_complete(mage.close())
     log.info('Shutting down')
-    srv.close()
-    loop.run_until_complete(srv.wait_closed())
+    loop.run_until_complete(runner.cleanup())
     loop.run_until_complete(app.shutdown())
 
 log.info('Prophetess stopped')

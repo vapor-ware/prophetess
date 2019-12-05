@@ -17,7 +17,8 @@ plugin_latency = Histogram(
 )
 
 
-class Timer():
+class Timer:
+
     def __init__(self, *, observer: Histogram, labels: Collection[str]) -> None:
         self.histogram = observer
         self._start_time = None

@@ -24,6 +24,12 @@ class Timer:
         self._start_time = None
         self.labels = labels
 
+    def __enter__(self):
+        self.start()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.stop()
+
     def start(self) -> None:
         self._start_time = time.time()
 

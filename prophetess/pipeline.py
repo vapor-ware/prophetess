@@ -71,27 +71,23 @@ class Pipeline:
             await e.close()
 
     async def run(self) -> None:
-        self.timer.start()
-        for e in self.extractors:
-            log.debug('Running Extractor {}'.format(e))
-            e.timer.start()
-            async for record in e.run():
-                e.timer.stop()
-                log.debug('{} produced {}'.format(e, record))
-                await self.process(record)
-
-        self.timer.stop()
+        with self.timer:
+            for e in self.extractors:
+                log.debug('Running Extractor {}'.format(e))
+                e.timer.start()
+                async for record in e.run():
+                    e.timer.stop()
+                    log.debug('{} produced {}'.format(e, record))
+                    await self.process(record)
 
     async def process(self, record: Dict[str, Any]) -> None:
-        self.transform.timer.start()
-        try:
-            async for payload in self.transform.run(record):
-                log.debug('{} produced {}'.format(self.transform, payload))
-                await self.load(payload)
-        except KeyError:
-            raise
-        finally:
-            self.transform.timer.stop()
+        with self.transform.timer:
+            try:
+                async for payload in self.transform.run(record):
+                    log.debug('{} produced {}'.format(self.transform, payload))
+                    await self.load(payload)
+            except KeyError:
+                raise
 
     async def load(self, record: Dict[str, Any]) -> None:
         if not record:
@@ -100,15 +96,13 @@ class Pipeline:
         for l in self.loaders:
             log.debug('Running Loader: {}'.format(l))
 
-            l.timer.start()
-            try:
-                await l.run(record)
-            except ProphetessException as e:
-                log.warning('{} Loader failed: {}'.format(l.id, e))
-            except Exception as e:
-                log.error('{} raised unexpected exception: {}'.format(l.id, e))
-            finally:
-                l.timer.stop()
+            with l.timer:
+                try:
+                    await l.run(record)
+                except ProphetessException as e:
+                    log.warning('{} Loader failed: {}'.format(l.id, e))
+                except Exception as e:
+                    log.error('{} raised unexpected exception: {}'.format(l.id, e))
 
     def __str__(self) -> str:
         return '{}({})'.format(type(self).__name__, self.id)

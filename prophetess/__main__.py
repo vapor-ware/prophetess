@@ -49,7 +49,7 @@ asyncio.ensure_future(mage.start())
 try:
     loop.run_forever()
 except KeyboardInterrupt:
-    log.warn('Control loop interrupted via Keyboard')
+    log.warning('Control loop interrupted via Keyboard')
 finally:
     log.info('Cleaning pipelines')
     loop.run_until_complete(mage.close())

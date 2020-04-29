@@ -59,7 +59,10 @@ class Transformer(PluginBase):
 
     @staticmethod
     def format(string: str, mapping: Dict[str, Any]) -> str:
-        return string.format(**mapping)
+        try:
+            return string.format(**mapping)
+        except (TypeError, KeyError):
+            return None
 
     def parse(self, keys: Union[str, Dict[str, Any]], values: Dict[str, Any]) -> Union[str, Dict[str, Any]]:
         if isinstance(keys, str):

@@ -30,7 +30,8 @@ def build_pipelines(cfg: Dict[str, Any]) -> 'Pipelines':
 
         pipelines.append(Pipeline(
             id=name,
-            extractors=[build_plugin('Extractor', e, extractors[e]) for e in data.get('extractors', [])],
+            extractors=[build_plugin('Extractor', e, extractors[e])
+                        for e in data.get('extractors', [])],
             transform=transformer,
             loaders=[build_plugin('Loader', e, loaders[e]) for e in data.get('loaders', [])]
         ))
@@ -93,16 +94,16 @@ class Pipeline:
         if not record:
             return
 
-        for l in self.loaders:
-            log.debug('Running Loader: {}'.format(l))
+        for loader in self.loaders:
+            log.debug('Running Loader: {}'.format(loader))
 
-            with l.timer:
+            with loader.timer:
                 try:
-                    await l.run(record)
+                    await loader.run(record)
                 except ProphetessException as e:
-                    log.warning('{} Loader failed: {}'.format(l.id, e))
+                    log.warning('{} Loader failed: {}'.format(loader.id, e))
                 except Exception as e:
-                    log.error('{} raised unexpected exception: {}'.format(l.id, e))
+                    log.error('{} raised unexpected exception: {}'.format(loader.id, e))
 
     def __str__(self) -> str:
         return '{}({})'.format(type(self).__name__, self.id)

@@ -1,4 +1,4 @@
-FROM vaporio/python:3.8 as builder
+FROM docker.io/vaporio/python:3.8 as builder
 
 # ARG BRANCH=master
 # ARG ORG=vapor-ware
@@ -15,7 +15,7 @@ WORKDIR /build
 RUN pip install --prefix=/build -r /requirements.txt --no-warn-script-location \
       && rm -rf /root/.cache
 
-FROM vaporio/python:3.8-slim
+FROM docker.io/vaporio/python:3.8-slim
 COPY --from=builder /build /usr/local
 COPY --from=builder /src/prophetess /src
 
